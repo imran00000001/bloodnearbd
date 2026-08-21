@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Manrope', 'Noto Sans Bengali', sans-serif;
+  /* very light reddish-pink instead of plain white, across the whole site */
+  background-color: #FFF1F2;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Fraunces', 'Noto Sans Bengali', serif;
+}
