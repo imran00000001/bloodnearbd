@@ -105,7 +105,7 @@ const MyDonationRequests = () => {
   if (isUserDonationLoading) {
     return (
       <>
-        <div className="h-screen container mx-auto flex justify-center items-center">
+        <div className="h-screen container mx-auto flex justify-center items-center bg-white">
           <img
             className=""
             src="https://cdn.dribbble.com/users/251111/screenshots/2775428/dailyui-014.gif"

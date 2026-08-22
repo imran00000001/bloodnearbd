@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import SideBar from "../Pages/Dashboard/Shared/SideBar";
 import Footer from "../Components/Shared/Footer/Footer";
+import VerifyEmailBanner from "../Components/Shared/VerifyEmailBanner/VerifyEmailBanner";
 import useAuth from "../hooks/useAuth";
 import { useState } from "react";
 
@@ -9,7 +10,7 @@ const DashboardLayOut = () => {
   const { loading } = useAuth()
   if (loading) {
     return <>
-      <div className="h-screen container mx-auto flex justify-center items-center">
+      <div className="h-screen container mx-auto flex justify-center items-center bg-white">
         <img
           className=""
           src="https://cdn.dribbble.com/users/251111/screenshots/2775428/dailyui-014.gif"
@@ -22,6 +23,7 @@ const DashboardLayOut = () => {
 
   return (
     <div>
+      <VerifyEmailBanner />
       <div className="flex ">
         <SideBar />
         <Outlet />
