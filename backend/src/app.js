@@ -1,5 +1,3 @@
-const dns = require("dns");
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const applyMiddleWare = require("./middlewares/applyMiddleware");
 const connectDB = require("./db/connectDB");
@@ -23,6 +21,24 @@ const reportRoutes = require('./routes/reports')
 
 
 applyMiddleWare(app);
+
+// On Vercel this file runs as a serverless function per request, so the DB
+// connection can't be made once at boot like a normal always-on server.
+// dbReady caches the connection promise so a warm (already-connected)
+// invocation reuses it instead of reconnecting on every single request.
+let dbReady = null;
+const ensureDB = () => {
+  if (!dbReady) {
+    dbReady = connectDB().then(() => seedInitialBlog());
+  }
+  return dbReady;
+};
+
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    ensureDB().then(() => next()).catch(next);
+  });
+}
 
 app.use(authenticationRoutes);
 app.use(districtsRoutes);
@@ -52,12 +68,20 @@ app.use((err, req, res, next) => {
   });
 });
 
-const main = async () => {
-  await connectDB();
-  await seedInitialBlog();
-  app.listen(port, (req, res) => {
-    console.log(`Blood Donation Server running on this port: ${port}`);
-  });
-};
+if (!process.env.VERCEL) {
+  // Local dev / a traditional always-on server: connect once, then listen.
+  const main = async () => {
+    await connectDB();
+    await seedInitialBlog();
+    app.listen(port, () => {
+      console.log(`Blood Donation Server running on this port: ${port}`);
+    });
+  };
+  main();
+}
 
-main();
+// Vercel's @vercel/node runtime needs the Express app itself exported here —
+// it wraps this export as the serverless function and calls it per-request.
+// Without this line, Vercel has no valid handler to route requests to,
+// which is what was causing the intermittent "404: NOT_FOUND" errors.
+module.exports = app;
